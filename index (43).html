@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Performance Alquiler ESP 2025</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--g:#1D9E75;--gl:#E1F5EE;--gd:#085041;--r:#E24B4A;--rl:#FCEBEB;--rd:#791F1F;--a:#BA7517;--al:#FAEEDA;--ad:#633806;--bg:#F7F6F2;--sf:#fff;--br:#E5E3DC;--tx:#1A1A18;--mu:#7A7870}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.top{background:var(--sf);border-bottom:1px solid var(--br);padding:0 2rem;height:56px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50}
+.top-ttl{font-family:'DM Serif Display',serif;font-size:18px;flex:1}
+.bdg{font-size:11px;background:var(--gl);color:var(--gd);border-radius:20px;padding:3px 12px;font-weight:500}
+.btn{display:none;align-items:center;gap:8px;padding:7px 14px;border-radius:8px;border:1px solid var(--br);background:var(--sf);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;color:var(--tx)}
+.btn:hover{background:var(--bg)}
+.btn.show{display:flex}
+.main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem}
+.ucard{background:var(--sf);border:1px solid var(--br);border-radius:16px;padding:3rem 2rem;text-align:center;margin-bottom:1.5rem}
+.ucard h1{font-family:'DM Serif Display',serif;font-size:24px;margin-bottom:8px}
+.ucard p{color:var(--mu);font-size:14px;margin-bottom:1.5rem}
+.ucard .hint-cols{font-size:12px;color:var(--mu);margin-top:1rem;background:var(--bg);border-radius:8px;padding:10px 14px;display:inline-block;text-align:left}
+.ucard .hint-cols span{display:inline-block;background:var(--gl);color:var(--gd);border-radius:4px;padding:1px 7px;font-size:11px;margin:2px}
+.drop{border:1.5px dashed var(--br);border-radius:12px;padding:2rem;cursor:pointer;transition:all .15s;max-width:500px;margin:0 auto}
+.drop:hover,.drop.over{border-color:var(--g);background:var(--gl)}
+.drop p{font-size:14px;color:var(--mu)}
+.drop strong{color:var(--g)}
+#fi{display:none}
+.err{display:none;background:var(--rl);color:var(--rd);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:1rem}
+.prev-card{display:none;background:var(--sf);border:1px solid var(--br);border-radius:12px;padding:14px 20px;margin-bottom:1.5rem;font-size:12px;color:var(--mu)}
+.sum{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:1.5rem}
+.met{background:var(--sf);border:1px solid var(--br);border-radius:12px;padding:16px 18px}
+.met-l{font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.met-v{font-family:'DM Serif Display',serif;font-size:22px}
+.met-v.pos{color:var(--g)}.met-v.neg{color:var(--r)}.met-v.warn{color:var(--a)}
+.met-sub{font-size:11px;color:var(--mu);margin-top:4px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:1.5rem}
+.mo-sel{font-family:'DM Sans',sans-serif;font-size:12px;padding:5px 10px;border-radius:20px;border:1px solid var(--br);background:var(--sf);color:var(--tx);cursor:pointer;outline:none}
+.mo-sel:focus{border-color:var(--g)}
+.tbl-wrap{background:var(--sf);border:1px solid var(--br);border-radius:14px;overflow:hidden;margin-bottom:1.5rem}
+.tbl-head{padding:14px 20px;border-bottom:1px solid var(--br)}
+.tbl-head h2{font-family:'DM Serif Display',serif;font-size:17px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);padding:10px 14px;text-align:right;font-weight:500;border-bottom:1px solid var(--br);background:var(--bg);white-space:nowrap}
+th:first-child{text-align:left}
+td{padding:10px 14px;text-align:right;border-bottom:1px solid #f0ede6}
+td:first-child{text-align:left;font-weight:500}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#faf9f6}
+.rag{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;flex-shrink:0}
+.rag.g{background:var(--g)}.rag.a{background:var(--a)}.rag.r{background:var(--r)}.rag.n{background:var(--br)}
+.pos-val{color:var(--gd)}.neg-val{color:var(--rd)}.warn-val{color:var(--ad)}
+.no-bgt{color:var(--mu);font-style:italic;font-size:12px}
+.expand-btn{background:none;border:none;cursor:pointer;color:var(--mu);font-size:12px;padding:2px 6px;border-radius:4px;margin-left:4px}
+.expand-btn:hover{background:var(--bg);color:var(--g)}
+.mo-detail{display:none;background:#faf9f6}
+.mo-detail.open{display:table-row-group}
+.mo-detail td{font-size:12px;color:var(--mu);padding:6px 14px 6px 32px;border-bottom:1px solid #f5f2ec}
+.mo-detail td:first-child{text-align:left}
+#res{display:none}
+</style>
+</head>
+<body>
+<div class="top">
+  <span class="top-ttl">Performance · Alquiler ESP 2025</span>
+  <span class="bdg">Real vs Presupuesto</span>
+  <div id="gapBadge" style="display:none;align-items:center;gap:8px;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600;border:1.5px solid var(--br);background:var(--sf)">
+    <span style="font-size:11px;color:var(--mu);font-weight:400">GAP neto vs presupuesto</span>
+    <span id="gapVal" style="font-family:'DM Serif Display',serif;font-size:16px"></span>
+    <span id="gapPct" style="font-size:12px"></span>
+  </div>
+  <button class="btn" id="bShare" onclick="shareApp()">⬆ Compartir</button>
+  <button class="btn" id="bRst">↩ Nuevo archivo</button>
+</div>
+
+<div class="main">
+  <div id="up">
+    <div class="ucard">
+      <div style="font-size:40px;margin-bottom:1rem">🏠</div>
+      <h1>Performance por piso</h1>
+      <p>Sube el libro diario de Holded (CSV) — se detectan automáticamente ingresos y gastos por piso</p>
+      <div class="hint-cols">
+        Ingresos: cuentas <span>(RINC)</span> · Gastos: cuentas <span>(GA)</span> · El nombre del piso se extrae del nombre de cuenta
+      </div>
+      <div class="drop" id="dz" style="margin-top:1.5rem">
+        <p>Arrastra el <strong>CSV</strong> del libro diario aquí</p>
+        <p style="margin-top:6px;font-size:12px">o haz clic para seleccionar</p>
+        <input type="file" id="fi" accept=".csv,.tsv,.txt" multiple>
+      </div>
+    </div>
+    <div class="err" id="err"></div>
+    <div class="prev-card" id="prev"></div>
+  </div>
+
+  <div id="res">
+    <div class="sum" id="sum"></div>
+    <div class="filters" id="filters"></div>
+    <div id="content"></div>
+  </div>
+</div>
+
+<script>
+// ── Presupuesto 2025 embebido ──────────────────────────────────────────
+const BUDGET=[{"name": "Castellon 3", "months": {"1": 2120.0, "2": 2120.0, "3": 2120.0, "4": 2120.31, "5": 2120.0, "6": 2120.0, "7": 2120.0, "8": 2120.1, "9": 2120.0, "10": 2120.0, "11": 2120.0, "12": 1802.72}}, {"name": "Coliving Malaga 1 + 2", "months": {"1": 5974.32, "2": 5974.32, "3": 5974.32, "4": 5975.19, "5": 5974.32, "6": 5974.32, "7": 5974.32, "8": 5974.61, "9": 5974.32, "10": 5974.32, "11": 5974.32, "12": 5080.2}}, {"name": "Libeen", "months": {"1": 1778.33, "2": 1778.33, "3": 1778.33, "4": 1778.59, "5": 1778.33, "6": 1778.33, "7": 1778.33, "8": 1778.42, "9": 1778.33, "10": 1778.33, "11": 1778.33, "12": 1512.19}}, {"name": "Malaga 2", "months": {"1": 2077.82, "2": 2077.82, "3": 2077.82, "4": 2078.12, "5": 2077.82, "6": 2077.82, "7": 2077.82, "8": 2077.92, "9": 2077.82, "10": 2077.82, "11": 2077.82, "12": 1766.85}}, {"name": "Malaga 3", "months": {"1": 1991.68, "2": 1991.68, "3": 1991.68, "4": 1991.97, "5": 1991.68, "6": 1991.68, "7": 1991.68, "8": 1991.78, "9": 1991.68, "10": 1991.68, "11": 1991.68, "12": 1693.61}}, {"name": "Malaga 4", "months": {"1": 836.17, "2": 836.17, "3": 836.17, "4": 836.29, "5": 836.17, "6": 836.17, "7": 836.17, "8": 836.21, "9": 836.17, "10": 836.17, "11": 836.17, "12": 711.03}}, {"name": "Malaga 5", "months": {"1": 2015.21, "2": 2015.21, "3": 2015.21, "4": 2015.5, "5": 2015.21, "6": 2015.21, "7": 2015.21, "8": 2015.31, "9": 2015.21, "10": 2015.21, "11": 1007.61, "12": 856.81}}, {"name": "Malaga 6", "months": {"1": 2011.35, "2": 2011.35, "3": 2011.35, "4": 2011.64, "5": 2011.35, "6": 2011.35, "7": 2011.35, "8": 2011.45, "9": 2011.35, "10": 2011.35, "11": 2011.35, "12": 1710.33}}, {"name": "Malaga 7", "months": {"1": 1956.92, "2": 1956.92, "3": 1956.92, "4": 1957.2, "5": 1956.92, "6": 1956.92, "7": 1956.92, "8": 1957.02, "9": 1956.92, "10": 1956.92, "11": 1956.92, "12": 1664.05}}, {"name": "Malaga 8", "months": {"1": 1956.92, "2": 1956.92, "3": 1956.92, "4": 1957.2, "5": 1956.92, "6": 1956.92, "7": 1956.92, "8": 1957.02, "9": 1956.92, "10": 1956.92, "11": 1956.92, "12": 1664.05}}, {"name": "Oviedo 1", "months": {"1": 1571.77, "2": 1571.77, "3": 1571.77, "4": 1572.0, "5": 1571.77, "6": 1571.77, "7": 1571.77, "8": 1571.85, "9": 1571.77, "10": 1571.77, "11": 1571.77, "12": 0}}, {"name": "Sevilla 4", "months": {"1": 648.45, "2": 648.45, "3": 648.45, "4": 648.54, "5": 648.45, "6": 648.45, "7": 648.45, "8": 648.48, "9": 648.45, "10": 648.45, "11": 648.45, "12": 551.4}}, {"name": "Sevilla 5", "months": {"1": 581.53, "2": 581.53, "3": 581.53, "4": 581.61, "5": 581.53, "6": 581.53, "7": 581.53, "8": 0, "9": 0, "10": 0, "11": 0, "12": 0}}, {"name": "Sevilla 6", "months": {"1": 621.5, "2": 621.5, "3": 621.5, "4": 621.59, "5": 621.5, "6": 621.5, "7": 621.5, "8": 0, "9": 0, "10": 0, "11": 0, "12": 0}}, {"name": "Tulum 1", "months": {"1": 2704.95, "2": 2704.95, "3": 2704.95, "4": 2705.34, "5": 2704.95, "6": 2704.95, "7": 2704.95, "8": 0, "9": 0, "10": 0, "11": 0, "12": 0}}, {"name": "Tulum 2", "months": {"1": 3246.79, "2": 3246.79, "3": 3246.79, "4": 3247.26, "5": 3246.79, "6": 3246.79, "7": 3246.79, "8": 3246.95, "9": 3246.79, "10": 3246.79, "11": 3246.79, "12": 0}}, {"name": "Valencia 1", "months": {"1": 869.83, "2": 869.83, "3": 869.83, "4": 869.96, "5": 869.83, "6": 869.83, "7": 869.83, "8": 869.87, "9": 869.83, "10": 869.83, "11": 869.83, "12": 0}}, {"name": "Valencia 3", "months": {"1": 788.58, "2": 788.58, "3": 788.58, "4": 788.69, "5": 788.58, "6": 788.58, "7": 788.58, "8": 788.62, "9": 788.58, "10": 788.58, "11": 788.58, "12": 0}}, {"name": "Valencia 4", "months": {"1": 1025.42, "2": 1025.42, "3": 1025.42, "4": 1025.57, "5": 1025.42, "6": 1025.42, "7": 1025.42, "8": 1025.47, "9": 1025.42, "10": 1025.42, "11": 1025.42, "12": 871.96}}, {"name": "Valencia 5", "months": {"1": 1113.83, "2": 1113.83, "3": 1113.83, "4": 1113.99, "5": 1113.83, "6": 1113.83, "7": 1113.83, "8": 1113.88, "9": 1113.83, "10": 1113.83, "11": 1113.83, "12": 947.13}}, {"name": "Valencia 6", "months": {"1": 1224.17, "2": 1224.17, "3": 1224.17, "4": 1224.34, "5": 1224.17, "6": 1224.17, "7": 1224.17, "8": 1224.23, "9": 1224.17, "10": 1224.17, "11": 1224.17, "12": 1040.96}}, {"name": "Valencia 7", "months": {"1": 1085.0, "2": 1085.0, "3": 1085.0, "4": 1085.16, "5": 1085.0, "6": 1085.0, "7": 1085.0, "8": 1085.05, "9": 1085.0, "10": 1085.0, "11": 1085.0, "12": 922.62}}];
+
+// Build lookup: "coliving malaga" → budget entry
+// Also build list of piso names sorted longest first (to avoid substring collisions)
+const BUDGET_MAP={};
+BUDGET.forEach(b=>{ BUDGET_MAP[b.name.toLowerCase()]=b; });
+const PISO_NAMES=BUDGET.map(b=>b.name).sort((a,b)=>b.length-a.length);
+
+// ── Holded account classification ─────────────────────────────────────
+// (RINC) = income accounts, (GA) = operating expense accounts
+const isIncome = n => /\(RINC\)/i.test(n);
+const isGastoRec = n => /\(GA\)/i.test(n) && /^(Agua|Luz|Comunidad|Limpieza|Tel[eé]fono|IBI|Gestores?|Primas de Seguros|Gestoria)\s/i.test(n.trim());
+const isGastoRep = n => /\(GA\)/i.test(n) && /^(Reparaciones|Puesta a punto|Comision Agente)/i.test(n.trim());
+const isGasto    = n => isGastoRec(n) || isGastoRep(n);
+
+// Extract piso name from Holded account name
+// e.g. "Recurrente Alquiler Valencia 3 (RINC)" → "Valencia 3"
+// e.g. "Agua Malaga 6 (GA)" → "Malaga 6"
+function extractPiso(accountName){
+  const clean = accountName.replace(/\s*\([A-Z]+\)\s*$/i,'').trim();
+  const stripped = clean
+    .replace(/^Recurrente\s+Alquiler[es]?\s+/i,'')
+    .replace(/^Recurrente\s+/i,'')
+    .replace(/^Agua\s+/i,'')
+    .replace(/^Luz\s+[\/]?\s*/i,'')
+    .replace(/^Comunidad\s+/i,'')
+    .replace(/^Limpieza\s+/i,'')
+    .replace(/^Gestores\s+/i,'')
+    .replace(/^IBI\s+/i,'')
+    .replace(/^Telefono\s+/i,'')
+    .replace(/^Reparaciones\s+Puntuales\s+/i,'')
+    .replace(/^Primas\s+de\s+Seguros\s+/i,'')
+    .trim();
+
+  // Merge: Coliving Malaga 1 and Coliving Malaga 2 → Coliving Malaga 1 + 2
+  if(/^coliving\s+malaga\s+(1|2)$/i.test(stripped)) return 'Coliving Malaga 1 + 2';
+
+  for(const p of PISO_NAMES){
+    if(stripped.toLowerCase()===p.toLowerCase()) return p;
+  }
+  for(const p of PISO_NAMES){
+    if(stripped.toLowerCase().startsWith(p.toLowerCase())) return p;
+  }
+  return null;
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────
+const MONTHS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const fmt=n=>new Intl.NumberFormat('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n)+' €';
+const fmtS=n=>(n>=0?'+':'')+fmt(n);
+const fmtPct=n=>(n>=0?'+':'')+n.toFixed(1)+'%';
+
+let pyg={}, curMo='all';
+
+function showErr(msg){const e=document.getElementById('err');e.style.display='block';e.textContent=msg;}
+
+function parseNum(s){
+  if(!s) return 0;
+  let c=String(s).replace(/[\u00a0\u202f\s]/g,'').replace(/[€$]/g,'');
+  if(!c||c==='-') return 0;
+  const lc=c.lastIndexOf(','), ld=c.lastIndexOf('.');
+  if(lc>ld) c=c.replace(/\./g,'').replace(',','.');
+  else c=c.replace(/,/g,'');
+  const n=parseFloat(c); return isNaN(n)?0:n;
+}
+
+function parseDate(s){
+  if(!s) return null;
+  const p=s.trim();
+  let m=p.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m) return{y:+m[3],mo:+m[2]-1};
+  m=p.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(m) return{y:+m[1],mo:+m[2]-1};
+  return null;
+}
+
+function splitLine(line,sep){
+  const res=[]; let cur='',inQ=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(ch==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
+    else if(ch===sep&&!inQ){res.push(cur);cur='';}
+    else cur+=ch;
+  }
+  res.push(cur);
+  return res.map(s=>s.trim().replace(/^"|"$/g,''));
+}
+
+function parseCSV(txt){
+  const lines=txt.replace(/\uFEFF/,'').replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n');
+  // Detect separator
+  let sep=',';
+  for(const l of lines.slice(0,10)){
+    if(!l.trim()) continue;
+    if((l.match(/;/g)||[]).length>2){sep=';';break;}
+    if((l.match(/\t/g)||[]).length>2){sep='\t';break;}
+  }
+  // Find header: line containing 'Debe' or 'Haber'
+  let hdrIdx=-1;
+  for(let i=0;i<Math.min(lines.length,20);i++){
+    if(lines[i].toLowerCase().includes('debe')||lines[i].toLowerCase().includes('haber')){hdrIdx=i;break;}
+  }
+  if(hdrIdx<0) return null;
+  const hdr=splitLine(lines[hdrIdx],sep);
+  const data=[];
+  for(let i=hdrIdx+1;i<lines.length;i++){
+    if(!lines[i].trim()) continue;
+    const row=splitLine(lines[i],sep);
+    const obj={};
+    hdr.forEach((h,j)=>obj[h.trim()]=row[j]||'');
+    data.push(obj);
+  }
+  return data;
+}
+
+// ── File handling ─────────────────────────────────────────────────────
+const dz=document.getElementById('dz');
+dz.onclick=()=>document.getElementById('fi').click();
+dz.ondragover=e=>{e.preventDefault();dz.classList.add('over')};
+dz.ondragleave=()=>dz.classList.remove('over');
+dz.ondrop=e=>{e.preventDefault();dz.classList.remove('over');handleFiles(e.dataTransfer.files)};
+document.getElementById('fi').onchange=e=>handleFiles(e.target.files);
+
+function handleFiles(files){
+  if(!files.length) return;
+  const results=[]; let done=0;
+  Array.from(files).forEach(f=>{
+    const r=new FileReader();
+    r.onload=e=>{results.push({name:f.name,text:e.target.result});if(++done===files.length)processFiles(results);};
+    r.readAsText(f,'UTF-8');
+  });
+}
+
+function processFiles(results){
+  document.getElementById('err').style.display='none';
+  pyg={};
+  let totalRows=0, matchedRows=0;
+  const labels=[];
+
+  results.forEach(({name,text})=>{
+    const data=parseCSV(text);
+    if(!data){showErr(`No se pudo leer: ${name}`);return;}
+    labels.push(name);
+
+    data.forEach(row=>{
+      const cuenta=row['Nombre de la cuenta']||'';
+      if(!cuenta) return;
+      totalRows++;
+
+      const esIngreso=isIncome(cuenta);
+      const esGasto=isGasto(cuenta);
+      if(!esIngreso&&!esGasto) return;
+
+      const piso=extractPiso(cuenta);
+      if(!piso) return;
+      matchedRows++;
+
+      const debe=parseNum(row['Debe']);
+      const haber=parseNum(row['Haber']);
+      const fecha=parseDate(row['Fecha']);
+      if(!fecha) return;
+      const moKey=`${fecha.y}-${String(fecha.mo+1).padStart(2,'0')}`;
+
+      if(!pyg[piso]) pyg[piso]={monthly:{}};
+      if(!pyg[piso].monthly[moKey]) pyg[piso].monthly[moKey]={ing:0,rec:0,rep:0};
+
+      if(esIngreso)          pyg[piso].monthly[moKey].ing+=haber;
+      if(isGastoRec(cuenta)) pyg[piso].monthly[moKey].rec+=debe;
+      if(isGastoRep(cuenta)) pyg[piso].monthly[moKey].rep+=debe;
+    });
+  });
+
+  if(!Object.keys(pyg).length){
+    showErr('No se encontraron cuentas (RINC) ni (GA) en el archivo. Verifica que sea el libro diario de Holded correcto.');
+    return;
+  }
+
+  // Preview
+  const prev=document.getElementById('prev');
+  prev.style.display='block';
+  prev.innerHTML=labels.map(f=>`<span style="background:var(--gl);color:var(--gd);border-radius:4px;padding:2px 8px;font-size:11px;margin-right:6px">✓ ${f}</span>`).join('')+
+    ` <span style="margin-left:8px">${Object.keys(pyg).length} pisos · ${matchedRows} líneas contables procesadas de ${totalRows} totales</span>`;
+
+  document.getElementById('up').style.display='none';
+  document.getElementById('res').style.display='block';
+  document.getElementById('bShare').classList.add('show');
+  document.getElementById('bRst').classList.add('show');
+  render();
+}
+
+// ── Budget helpers ────────────────────────────────────────────────────
+function getBudget(pisoName, mo){
+  const b=BUDGET_MAP[pisoName.toLowerCase()];
+  if(!b) return null;
+  if(mo==='all') return Object.values(b.months).reduce((a,v)=>a+v,0);
+  const mNum=parseInt(mo.split('-')[1]);
+  const v=b.months[String(mNum)];
+  return v!==undefined ? v : null;
+}
+
+function getReal(pisoName, mo){
+  const p=pyg[pisoName];
+  if(!p) return{ing:0,rec:0,rep:0,gas:0};
+  if(mo==='all'){
+    let ing=0,rec=0,rep=0;
+    Object.values(p.monthly).forEach(m=>{ing+=m.ing;rec+=m.rec||0;rep+=m.rep||0;});
+    return{ing,rec,rep,gas:rec+rep};
+  }
+  const m=p.monthly[mo]||{ing:0,rec:0,rep:0};
+  return{ing:m.ing,rec:m.rec||0,rep:m.rep||0,gas:(m.rec||0)+(m.rep||0)};
+}
+
+function ragClass(pct){
+  if(pct===null) return 'n';
+  if(pct>=-5) return 'g';
+  if(pct>=-15) return 'a';
+  return 'r';
+}
+
+function getAllMonths(){
+  const mo=new Set();
+  Object.values(pyg).forEach(p=>Object.keys(p.monthly).forEach(k=>mo.add(k)));
+  return [...mo].sort();
+}
+
+// ── Render ────────────────────────────────────────────────────────────
+function render(){renderSummary();renderFilters();renderTable();}
+
+function renderSummary(){
+  // Union: pisos con datos reales + pisos con presupuesto
+  const pisosReal=new Set(Object.keys(pyg));
+  const pisosBgt=new Set(BUDGET.map(b=>b.name));
+  const pisos=[...new Set([...pisosReal,...pisosBgt])];
+  let tIng=0,tBgt=0,tGas=0,nBgt=0,nOk=0;
+  pisos.forEach(p=>{
+    const r=getReal(p,curMo);tIng+=r.ing;tGas+=r.gas;
+    const b=getBudget(p,curMo);
+    if(b!==null){tBgt+=b;nBgt++;if(b===0||((r.ing-b)/b*100>=-5))nOk++;}
+  });
+  const devP=tBgt>0?(tIng-tBgt)/tBgt*100:null;
+  const neto=tIng-tGas;
+  const desvNeto=tBgt>0?(neto-tBgt)/tBgt*100:null;
+  document.getElementById('sum').innerHTML=`
+    <div class="met"><div class="met-l">Ingresos alquiler</div><div class="met-v pos">${fmt(tIng)}</div><div class="met-sub">${curMo==='all'?'Acumulado':'Mes seleccionado'}</div></div>
+    <div class="met"><div class="met-l">Gastos explotación (GA)</div><div class="met-v neg">${fmt(tGas)}</div><div class="met-sub">Recurrentes + reparaciones</div></div>
+    <div class="met"><div class="met-l">Neto real</div><div class="met-v ${neto>=0?'pos':'neg'}">${fmt(neto)}</div><div class="met-sub">Ingresos − gastos</div></div>
+    <div class="met"><div class="met-l">Presupuesto</div><div class="met-v">${fmt(tBgt)}</div><div class="met-sub">${nBgt} pisos · total anual 426.370 €</div></div>
+    <div class="met"><div class="met-l">Desv. neto vs presupuesto</div><div class="met-v ${desvNeto===null?'':desvNeto>=-5?'pos':desvNeto>=-15?'warn':'neg'}">${desvNeto===null?'—':fmtPct(desvNeto)}</div><div class="met-sub">${desvNeto!==null?fmtS(neto-tBgt):''}</div></div>`;
+  // Update top gap badge
+  const gap=neto-tBgt;
+  const gapBadge=document.getElementById('gapBadge');
+  const gapVal=document.getElementById('gapVal');
+  const gapPct=document.getElementById('gapPct');
+  if(gapBadge){
+    gapBadge.style.display='flex';
+    const col=gap>=0?'var(--g)':gap>=-tBgt*0.15?'var(--a)':'var(--r)';
+    gapVal.style.color=col;
+    gapPct.style.color=col;
+    gapVal.textContent=(gap>=0?'+':'')+new Intl.NumberFormat('es-ES',{minimumFractionDigits:0,maximumFractionDigits:0}).format(gap)+' €';
+    gapPct.textContent=desvNeto!==null?'('+fmtPct(desvNeto)+')':'';
+    gapBadge.style.borderColor=col;
+  }
+}
+
+function renderFilters(){
+  const months=getAllMonths();
+  let opts=`<option value="all">Todos los meses</option>`;
+  months.forEach(m=>{
+    const [y,mo]=m.split('-');
+    opts+=`<option value="${m}"${m===curMo?' selected':''}>${MONTHS[parseInt(mo)-1]} ${y}</option>`;
+  });
+  document.getElementById('filters').innerHTML=`
+    <select class="mo-sel" onchange="curMo=this.value;render()">${opts}</select>
+    <span style="font-size:12px;color:var(--mu)">Semáforo: <span style="color:var(--g)">● ≥−5%</span> <span style="color:var(--a)">● −5% a −15%</span> <span style="color:var(--r)">● &lt;−15%</span></span>`;
+}
+
+function renderTable(){
+  const pisos=[...new Set([...Object.keys(pyg),...BUDGET.map(b=>b.name)])].sort();
+  const allMo=getAllMonths();
+  let tbody='';
+
+  pisos.forEach((p,idx)=>{
+    const r=getReal(p,curMo);
+    const neto=r.ing-r.gas;
+    const b=getBudget(p,curMo);
+    const devE=b!==null?neto-b:null;
+    const devP=b!==null&&b>0?(neto-b)/b*100:null;
+    const rag=ragClass(devP);
+
+    let moRows='';
+    allMo.forEach(mo=>{
+      const mr=pyg[p]?.monthly[mo];
+      if(!mr||(!mr.ing&&!mr.gas)) return;
+      const [,m]=mo.split('-');
+      const mb=getBudget(p,mo);
+      const mNeto=mr.ing-(mr.rec||0)-(mr.rep||0);
+      const mdE=mb!==null?mNeto-mb:null;
+      const mdP=mb!==null&&mb>0?(mNeto-mb)/mb*100:null;
+      moRows+=`<tr>
+        <td style="padding-left:32px;font-size:11px;font-weight:400">${MONTHS[parseInt(m)-1]}</td>
+        <td class="pos-val">${fmt(mr.ing)}</td>
+        <td class="neg-val">${fmt(mr.rec)}</td>
+        <td class="warn-val">${mr.rep>0?fmt(mr.rep):'—'}</td>
+        <td class="${mNeto>=0?'pos-val':'neg-val'}">${fmt(mNeto)}</td>
+        <td>${mb!==null?fmt(mb):'<span class="no-bgt">—</span>'}</td>
+        <td>${mdE!==null?`<span class="${mdE>=0?'pos-val':mdP>=-15?'warn-val':'neg-val'}">${fmtS(mdE)}</span>`:'—'}</td>
+        <td>${mdP!==null?`<span class="rag ${ragClass(mdP)}"></span><span class="${mdP>=-5?'pos-val':mdP>=-15?'warn-val':'neg-val'}">${fmtPct(mdP)}</span>`:'—'}</td>
+      </tr>`;
+    });
+
+    tbody+=`<tr>
+      <td><span class="rag ${rag}"></span><strong>${p}</strong>
+        <button class="expand-btn" id="exp${idx}" onclick="toggleDetail(${idx})">▸ meses</button></td>
+      <td class="pos-val">${fmt(r.ing)}</td>
+      <td class="neg-val">${fmt(r.rec)}</td>
+      <td class="warn-val">${r.rep>0?fmt(r.rep):'—'}</td>
+      <td class="${neto>=0?'pos-val':'neg-val'}">${fmt(neto)}</td>
+      <td>${b!==null?fmt(b):'<span class="no-bgt">Sin presupuesto</span>'}</td>
+      <td>${devE!==null?`<span class="${devE>=0?'pos-val':devP>=-15?'warn-val':'neg-val'}">${fmtS(devE)}</span>`:'—'}</td>
+      <td>${devP!==null?`<span class="rag ${rag}"></span><span class="${devP>=-5?'pos-val':devP>=-15?'warn-val':'neg-val'}">${fmtPct(devP)}</span>`:'—'}</td>
+    </tr>
+    <tbody class="mo-detail" id="det${idx}">${moRows}</tbody>`;
+  });
+
+  let tI=0,tB=0,tG=0,hB=false;
+  // Union for totals too
+  const allPisos=[...new Set([...Object.keys(pyg),...BUDGET.map(b=>b.name)])];
+  let tRec=0,tRep=0;
+  allPisos.forEach(p=>{const r=getReal(p,curMo);tI+=r.ing;tRec+=r.rec;tRep+=r.rep;tG+=r.gas;const b=getBudget(p,curMo);if(b!==null){tB+=b;hB=true;}});
+  const tDP=hB&&tB>0?((tI-tG)-tB)/tB*100:null;
+
+  document.getElementById('content').innerHTML=`
+    <div class="tbl-wrap">
+      <div class="tbl-head"><h2>P&G por piso · ${curMo==='all'?'Acumulado':MONTHS[parseInt(curMo.split('-')[1])-1]+' '+curMo.split('-')[0]}</h2></div>
+      <table>
+        <thead><tr>
+          <th style="text-align:left">Piso</th>
+          <th>Ingresos</th><th>Suministros</th><th>Reparaciones</th><th>Neto real</th><th>Presupuesto</th><th>Gap €</th><th>Gap %</th>
+        </tr></thead>
+        <tbody>${tbody}</tbody>
+        <tfoot><tr style="background:var(--bg);font-weight:600;border-top:2px solid var(--br)">
+          <td>TOTAL</td>
+          <td style="text-align:right" class="pos-val">${fmt(tI)}</td>
+          <td style="text-align:right" class="neg-val">${fmt(tRec)}</td>
+          <td style="text-align:right" class="warn-val">${tRep>0?fmt(tRep):'—'}</td>
+          <td style="text-align:right" class="${(tI-tG)>=0?'pos-val':'neg-val'}">${fmt(tI-tG)}</td>
+          <td style="text-align:right">${hB?fmt(tB):'—'}</td>
+          <td style="text-align:right">${hB?`<span class="${(tI-tG)-tB>=0?'pos-val':'neg-val'}">${fmtS((tI-tG)-tB)}</span>`:'—'}</td>
+          <td style="text-align:right">${tDP!==null?`<span class="${tDP>=-5?'pos-val':tDP>=-15?'warn-val':'neg-val'}">${fmtPct(tDP)}</span>`:'—'}</td>
+        </tr></tfoot>
+      </table>
+    </div>`;
+}
+
+function toggleDetail(idx){
+  const det=document.getElementById(`det${idx}`);
+  const btn=document.getElementById(`exp${idx}`);
+  btn.textContent=det.classList.toggle('open')?'▾ meses':'▸ meses';
+}
+
+document.getElementById('bRst').onclick=()=>{
+  pyg={};curMo='all';
+  document.getElementById('up').style.display='block';
+  document.getElementById('res').style.display='none';
+  document.getElementById('bShare').classList.remove('show');
+  document.getElementById('bRst').classList.remove('show');
+  document.getElementById('err').style.display='none';
+  document.getElementById('prev').style.display='none';
+  document.getElementById('fi').value='';
+  const gb=document.getElementById('gapBadge');if(gb)gb.style.display='none';
+};
+
+async function compress(str){
+  const s=new CompressionStream('gzip'),w=s.writable.getWriter();
+  w.write(new TextEncoder().encode(str));w.close();
+  return btoa(String.fromCharCode(...new Uint8Array(await new Response(s.readable).arrayBuffer())));
+}
+async function decompress(b64){
+  const bytes=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+  const s=new DecompressionStream('gzip'),w=s.writable.getWriter();
+  w.write(bytes);w.close();
+  return new TextDecoder().decode(await new Response(s.readable).arrayBuffer());
+}
+async function shareApp(){
+  const btn=document.getElementById('bShare');btn.textContent='Generando…';btn.disabled=true;
+  try{
+    const url=location.origin+location.pathname+'#d='+await compress(JSON.stringify({pyg,v:1}));
+    await navigator.clipboard.writeText(url);
+    btn.textContent='✓ Link copiado';
+    setTimeout(()=>{btn.textContent='⬆ Compartir';btn.disabled=false;},3000);
+  }catch(e){btn.textContent='⬆ Compartir';btn.disabled=false;alert('Error: '+e.message);}
+}
+async function restoreFromHash(){
+  if(!location.hash.startsWith('#d=')) return;
+  try{
+    document.getElementById('up').innerHTML='<div style="padding:3rem;text-align:center;color:var(--mu);font-size:14px">Cargando…</div>';
+    const data=JSON.parse(await decompress(location.hash.slice(3)));
+    pyg=data.pyg;
+    document.getElementById('up').style.display='none';
+    document.getElementById('res').style.display='block';
+    document.getElementById('bShare').classList.add('show');
+    document.getElementById('bRst').classList.add('show');
+    render();
+  }catch(e){
+    document.getElementById('up').innerHTML='<div style="padding:3rem;text-align:center;color:var(--rd);font-size:14px">Error cargando el link.</div>';
+  }
+}
+restoreFromHash();
+</script>
+</body>
+</html>
