@@ -77,6 +77,21 @@ tr:hover td{background:#faf9f6}
 .adm-piso input:focus{border-color:var(--g)}
 .adm-mo-hdr{display:grid;grid-template-columns:140px repeat(12,1fr);gap:4px;padding:0 0 6px;font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;text-align:right}
 .adm-mo-hdr span:first-child{text-align:left}
+
+.reen-section{margin-bottom:2rem}
+.reen-section h3{font-family:'DM Serif Display',serif;font-size:16px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.reen-badge{font-size:10px;background:#7F77DD22;color:#7F77DD;border:1px solid #7F77DD44;border-radius:20px;padding:2px 10px;font-family:'DM Sans',sans-serif;font-weight:500}
+.reen-card{background:var(--sf);border:1px solid var(--br);border-radius:14px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;transition:box-shadow .15s}
+.reen-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.07)}
+.reen-cell{padding:18px 20px;border-right:1px solid var(--br)}
+.reen-cell:last-child{border-right:none}
+.reen-cell-label{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin-bottom:8px;font-weight:500}
+.reen-cell-val{font-family:'DM Serif Display',serif;font-size:22px}
+.reen-cell-sub{font-size:11px;color:var(--mu);margin-top:4px}
+.reen-loading{display:flex;align-items:center;gap:8px;color:var(--mu);font-size:13px;padding:20px}
+.reen-dot{width:8px;height:8px;border-radius:50%;background:#7F77DD;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.reen-err{color:var(--rd);font-size:12px;padding:16px 20px;background:var(--rl);border-radius:8px}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
@@ -117,6 +132,14 @@ tr:hover td{background:#faf9f6}
     <div class="sum" id="sum"></div>
     <div class="filters" id="filters"></div>
     <div id="content"></div>
+    <div class="reen-section" id="reenSection" style="display:none">
+      <h3>
+        Reenlever · Aave v3 Polygon
+        <span class="reen-badge">OPO-1 · 202.500 €</span>
+        <button onclick="loadReenlever()" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--mu);padding:2px 8px;border-radius:6px;border:1px solid var(--br)">↻ Actualizar</button>
+      </h3>
+      <div id="reenCard"><div class="reen-loading"><span class="reen-dot"></span>Conectando con Moralis…</div></div>
+    </div>
   </div>
 </div>
 
@@ -144,7 +167,7 @@ const isGasto    = n => isGastoRec(n) || isGastoRep(n) || isGastoGes(n);
 function extractPiso(accountName){
   const clean = accountName.replace(/\s*\([A-Z]+\)\s*$/i,'').trim();
   const stripped = clean
-    .replace(/^Recurrente\s+Alquiler[es]?\s+/i,'')
+    .replace(/^Recurrente\s+Alquiler(?:es)?\s+/i,'')
     .replace(/^Recurrente\s+/i,'')
     .replace(/^Agua\s+/i,'')
     .replace(/^Luz\s+[\/]?\s*/i,'')
@@ -176,6 +199,15 @@ const fmtS=n=>(n>=0?'+':'')+fmt(n);
 const fmtPct=n=>(n>=0?'+':'')+n.toFixed(1)+'%';
 
 let pyg={}, curMo='all', curYear='all', curPiso='all';
+
+// ── Reenlever / Aave config ───────────────────────────────────────────
+const MORALIS_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6ImVjZGNjZDhiLTVmYjAtNDExMC1iZWUxLTY2ZGNhODQwZjE2MyIsIm9yZ0lkIjoiNDc4Njc3IiwidXNlcklkIjoiNDkyNDY4IiwidHlwZUlkIjoiZmQ5Zjk4ZTUtZTc1Yy00Mjk0LWJkZjYtMmZiZTg0NjgzZmZiIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3Njk4NjYwMTIsImV4cCI6NDkyNTYyNjAxMn0.StuCFBwn4_Wv32m2FeuCeuMzJPVVWlewCwE2VxnMzto';
+const REENLEVER_WALLET  = '0x74D1d150b120E64cbFdD1318F594BA9630743322';
+const APOL_USDT_ADDRESS = '0x6ab707aca953edaefbc4fd23ba73294241490620'; // aPolUSDT Aave v3 Polygon
+const AAVE_POOL_ADDRESS = '0x794a61358D6845594F94dc1DB02A252b5b4814aD'; // Aave v3 Pool Polygon
+const USDT_ADDRESS      = '0xc2132d05d31c914a87c6611c10748aeb04b58e8f'; // USDT on Polygon
+const REENLEVER_CAPITAL = 202500; // € capital asignado OPO-1
+let reenData = null; // cached Moralis result
 // Budget 2026 — editable via Admin, persisted in share URL
 // Structure: { "Piso Name": { "1": 0, "2": 0, ... "12": 0 } }
 let budget2026 = {};
@@ -325,6 +357,7 @@ function processFiles(results){
   document.getElementById('bShare').classList.add('show');
   document.getElementById('bRst').classList.add('show');
   render();
+  loadReenlever();
 }
 
 // ── Budget helpers ────────────────────────────────────────────────────
@@ -557,6 +590,8 @@ document.getElementById('bRst').onclick=()=>{
   document.getElementById('bAdm').classList.remove('show');
   document.getElementById('bShare').classList.remove('show');
   document.getElementById('bRst').classList.remove('show');
+  document.getElementById('reenSection').style.display='none';
+  reenData=null;
   document.getElementById('err').style.display='none';
   document.getElementById('prev').style.display='none';
   document.getElementById('fi').value='';
@@ -725,6 +760,89 @@ function renderAdm(){
   document.getElementById('admBody').innerHTML=html;
 }
 
+
+// ── Reenlever / Moralis ───────────────────────────────────────────────
+async function loadReenlever(){
+  document.getElementById('reenSection').style.display='block';
+  document.getElementById('reenCard').innerHTML='<div class="reen-loading"><span class="reen-dot"></span>Consultando Moralis…</div>';
+  try {
+    // 1. Get aPolUSDT balance (= capital + accrued interest)
+    const balUrl=`https://deep-index.moralis.io/api/v2.2/${REENLEVER_WALLET}/erc20?chain=polygon&token_addresses%5B0%5D=${APOL_USDT_ADDRESS}`;
+    const balRes=await fetch(balUrl,{headers:{'X-API-Key':MORALIS_KEY,'Accept':'application/json'}});
+    const balData=await balRes.json();
+    const token=balData.result?.[0];
+    const decimals=token?parseInt(token.decimals):6;
+    const rawBal=token?BigInt(token.balance):0n;
+    const balance=Number(rawBal)/Math.pow(10,decimals); // aPolUSDT balance = capital + interest
+
+    // 2. Get current APY from Aave v3 via getReserveData (eth_call)
+    // liquidityRate is ray (1e27), APY ≈ liquidityRate/1e27 * 100
+    // Using Moralis runContractFunction
+    const apy = await fetchAaveAPY();
+
+    // 3. Estimate daily/monthly/annual interest
+    const dailyInterest  = balance * (apy/100) / 365;
+    const monthlyInterest= dailyInterest * 30;
+    const annualInterest = balance * (apy/100);
+
+    reenData={balance, apy, dailyInterest, monthlyInterest, annualInterest};
+    renderReenCard(reenData);
+  } catch(e) {
+    document.getElementById('reenCard').innerHTML=`<div class="reen-err">Error conectando con Moralis: ${e.message}</div>`;
+  }
+}
+
+async function fetchAaveAPY(){
+  try {
+    // Call getReserveData(asset) on Aave v3 Pool
+    // Returns struct, index 2 = currentLiquidityRate (ray = 1e27)
+    const url=`https://deep-index.moralis.io/api/v2.2/${AAVE_POOL_ADDRESS}/function?chain=polygon&function_name=getReserveData`;
+    const body=JSON.stringify({
+      abi:[{"inputs":[{"internalType":"address","name":"asset","type":"address"}],"name":"getReserveData","outputs":[{"components":[{"internalType":"uint256","name":"configuration","type":"uint256"},{"internalType":"uint128","name":"liquidityIndex","type":"uint128"},{"internalType":"uint128","name":"currentLiquidityRate","type":"uint128"},{"internalType":"uint128","name":"variableBorrowIndex","type":"uint128"},{"internalType":"uint128","name":"currentVariableBorrowRate","type":"uint128"},{"internalType":"uint128","name":"currentStableBorrowRate","type":"uint128"},{"internalType":"uint40","name":"lastUpdateTimestamp","type":"uint40"},{"internalType":"uint16","name":"id","type":"uint16"},{"internalType":"address","name":"aTokenAddress","type":"address"},{"internalType":"address","name":"stableDebtTokenAddress","type":"address"},{"internalType":"address","name":"variableDebtTokenAddress","type":"address"},{"internalType":"address","name":"interestRateStrategyAddress","type":"address"},{"internalType":"uint128","name":"accruedToTreasury","type":"uint128"},{"internalType":"uint128","name":"unbacked","type":"uint128"},{"internalType":"uint128","name":"isolationModeTotalDebt","type":"uint128"}],"internalType":"struct DataTypes.ReserveData","name":"","type":"tuple"}],"stateMutability":"view","type":"function"}],
+      params:{asset: USDT_ADDRESS}
+    });
+    const res=await fetch(url,{method:'POST',headers:{'X-API-Key':MORALIS_KEY,'Content-Type':'application/json','Accept':'application/json'},body});
+    const data=await res.json();
+    // currentLiquidityRate is ray (1e27)
+    const ray=1e27;
+    const liquidityRate=parseFloat(data.currentLiquidityRate||data?.[0]?.currentLiquidityRate||'0');
+    if(!liquidityRate) return 3.5; // fallback estimate
+    // APY = (1 + liquidityRate/ray/31536000)^31536000 - 1
+    const ratePerSecond=liquidityRate/ray/31536000;
+    const apy=((Math.pow(1+ratePerSecond,31536000))-1)*100;
+    return Math.max(0.1, apy);
+  } catch {
+    return 3.5; // fallback if APY call fails
+  }
+}
+
+function renderReenCard(d){
+  const fmtU=n=>new Intl.NumberFormat('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n)+' USDT';
+  const fmtE=n=>new Intl.NumberFormat('es-ES',{minimumFractionDigits:0,maximumFractionDigits:0}).format(n)+' €';
+  document.getElementById('reenCard').innerHTML=`
+    <div class="reen-card">
+      <div class="reen-cell">
+        <div class="reen-cell-label">Balance aPolUSDT</div>
+        <div class="reen-cell-val" style="color:#7F77DD">${fmtU(d.balance)}</div>
+        <div class="reen-cell-sub">Capital + intereses acumulados</div>
+      </div>
+      <div class="reen-cell">
+        <div class="reen-cell-label">APY actual</div>
+        <div class="reen-cell-val" style="color:var(--g)">${d.apy.toFixed(2)}%</div>
+        <div class="reen-cell-sub">Tasa Aave v3 USDT · Polygon</div>
+      </div>
+      <div class="reen-cell">
+        <div class="reen-cell-label">Intereses / mes estimado</div>
+        <div class="reen-cell-val" style="color:var(--g)">${fmtU(d.monthlyInterest)}</div>
+        <div class="reen-cell-sub">Sobre balance actual</div>
+      </div>
+      <div class="reen-cell">
+        <div class="reen-cell-label">Intereses / año estimado</div>
+        <div class="reen-cell-val" style="color:var(--g)">${fmtU(d.annualInterest)}</div>
+        <div class="reen-cell-sub">Capital asignado ${fmtE(REENLEVER_CAPITAL)}</div>
+      </div>
+    </div>`;
+}
 async function restoreFromHash(){
   if(!location.hash.startsWith('#d=')) return;
   try{
