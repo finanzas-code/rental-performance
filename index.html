@@ -16,7 +16,7 @@ body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--tx);min-h
 .btn{display:none;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:1px solid var(--br);background:var(--sf);font-family:"DM Sans",sans-serif;font-size:13px;font-weight:500;cursor:pointer;color:var(--tx)}
 .btn:hover{background:var(--bg)}
 .btn.show{display:flex}
-#gapBadge{display:none;align-items:center;gap:8px;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600;border:1.5px solid var(--br);background:var(--sf)}
+
 .main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem}
 .ucard{background:var(--sf);border:1px solid var(--br);border-radius:16px;padding:3rem 2rem;text-align:center;margin-bottom:1.5rem}
 .ucard h1{font-family:"DM Serif Display",serif;font-size:24px;margin-bottom:8px}
@@ -30,7 +30,7 @@ body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--tx);min-h
 .drop-wrap input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0}
 .err{display:none;background:var(--rl);color:var(--rd);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:1rem}
 .prev-card{display:none;background:var(--sf);border:1px solid var(--br);border-radius:12px;padding:12px 18px;margin-bottom:1.5rem;font-size:12px;color:var(--mu)}
-.sum{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:1.5rem}
+.sum{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:1.5rem}
 .met{background:var(--sf);border:1px solid var(--br);border-radius:12px;padding:16px 18px}
 .met-l{font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
 .met-v{font-family:"DM Serif Display",serif;font-size:22px}
@@ -88,11 +88,7 @@ tr:hover td{background:#faf9f6}
 <div class="top">
   <span class="top-ttl">Performance &middot; Alquiler</span>
   <span class="bdg">Real vs Disposici&oacute;n</span>
-  <div id="gapBadge">
-    <span style="font-size:11px;color:var(--mu);font-weight:400">GAP neto vs disposici&oacute;n</span>
-    <span id="gapVal" style="font-family:DM Serif Display,serif;font-size:16px"></span>
-    <span id="gapPct" style="font-size:12px"></span>
-  </div>
+
   <button class="btn" id="bAdm" onclick="openAdm()">&#9881; Admin 2026</button>
   <button class="btn" id="bShare" onclick="shareApp()">&#8679; Compartir</button>
   <button class="btn" id="bRst" onclick="resetApp()">&#8617; Nuevo archivo</button>
@@ -348,19 +344,15 @@ function renderSummary(){
     var b=getBudget(p,curMo);if(b!==null){tBgt+=b;nBgt++;var neto=r.ing-r.gas;if(b===0||(neto-b)/b*100>=-5)nOk++;}
   });
   var neto=tIng-tGas,devN=tBgt>0?(neto-tBgt)/tBgt*100:null,gap=neto-tBgt;
-  var gb=document.getElementById("gapBadge");gb.style.display="flex";
-  var col=gap>=0?"var(--g)":tBgt>0&&gap>=-tBgt*0.15?"var(--a)":"var(--r)";
-  gb.style.borderColor=col;
-  document.getElementById("gapVal").style.color=col;
-  document.getElementById("gapPct").style.color=col;
-  document.getElementById("gapVal").textContent=(gap>=0?"+":"")+new Intl.NumberFormat("es-ES",{minimumFractionDigits:0,maximumFractionDigits:0}).format(gap)+" €";
-  document.getElementById("gapPct").textContent=devN!==null?"("+fmtP(devN)+")":"";
+  var gapCol=gap>=0?"#1D9E75":tBgt>0&&gap>=-tBgt*0.15?"#BA7517":"#E24B4A";
+  var gapFmt=(gap>=0?"+":"")+new Intl.NumberFormat("es-ES",{minimumFractionDigits:0,maximumFractionDigits:0}).format(gap)+" €";
   document.getElementById("sum").innerHTML=
     '<div class="met"><div class="met-l">Ingresos alquiler</div><div class="met-v pos">'+fmt(tIng)+'</div><div class="met-sub">'+(curMo==="all"?"Acumulado":"Mes seleccionado")+'</div></div>'+
     '<div class="met"><div class="met-l">Gastos explotación</div><div class="met-v neg">'+fmt(tGas)+'</div><div class="met-sub">Suministros + gestores + reparaciones</div></div>'+
     '<div class="met"><div class="met-l">Neto real</div><div class="met-v '+(neto>=0?"pos":"neg")+'">'+fmt(neto)+'</div><div class="met-sub">Ingresos − gastos</div></div>'+
-    '<div class="met"><div class="met-l">Puesto a disposición</div><div class="met-v">'+(tBgt>0?fmt(tBgt):"—")+'</div><div class="met-sub">'+nBgt+' pisos</div></div>'+
-    '<div class="met"><div class="met-l">Pisos en verde</div><div class="met-v pos">'+nOk+" / "+nBgt+'</div><div class="met-sub">Gap ≥ −5%</div></div>';
+    '<div class="met"><div class="met-l">Puesto a disposición</div><div class="met-v">'+(tBgt>0?fmt(tBgt):"—")+'</div><div class="met-sub">'+nBgt+' pisos · '+(curYear!=="all"?curYear:"todos los años")+'</div></div>'+
+    '<div class="met"><div class="met-l">Pisos en verde</div><div class="met-v pos">'+nOk+" / "+nBgt+'</div><div class="met-sub">Gap ≥ −5%</div></div>'+
+    '<div class="met" style="border-color:'+gapCol+'"><div class="met-l" style="color:'+gapCol+'">GAP neto vs disposición</div><div class="met-v" style="color:'+gapCol+'">'+gapFmt+'</div><div class="met-sub" style="color:'+gapCol+'">'+(devN!==null?fmtP(devN):"—")+'</div></div>';
 }
 
 function renderFilters(){
@@ -439,7 +431,6 @@ function resetApp(){
   document.getElementById("res").style.display="none";
   document.getElementById("err").style.display="none";
   document.getElementById("prev").style.display="none";
-  document.getElementById("gapBadge").style.display="none";
   document.getElementById("fi").value="";
   ["bAdm","bShare","bRst"].forEach(function(id){document.getElementById(id).classList.remove("show");});
 }
@@ -513,8 +504,7 @@ async function restoreFromHash(){
     pyg=data.pyg;budget2026=data.budget2026||{};
     document.getElementById("up").style.display="none";
     document.getElementById("res").style.display="block";
-    document.getElementById("gapBadge").style.display="flex";
-    ["bAdm","bShare","bRst"].forEach(function(id){document.getElementById(id).classList.add("show");});
+      ["bAdm","bShare","bRst"].forEach(function(id){document.getElementById(id).classList.add("show");});
     render();
   }catch(e){document.getElementById("up").innerHTML='<div style="padding:3rem;text-align:center;color:var(--rd);font-size:14px">Error cargando el link.</div>';}
 }
