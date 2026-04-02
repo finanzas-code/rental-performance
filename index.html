@@ -356,16 +356,17 @@ function processFiles(results){
   const prev=document.getElementById('prev');
   prev.style.display='block';
   const excludedEur=excludedRows.reduce((a,r)=>a+(r.amount||0),0);
-  const excludedHtml=excludedRows.length?
-    `<details style="margin-top:8px"><summary style="cursor:pointer;font-size:11px;color:var(--mu)">${excludedRows.length} líneas (RINC)/(GA) excluidas sin piso reconocido · ${excludedEur.toLocaleString('es-ES',{minimumFractionDigits:2})} €</summary>
-    <div style="max-height:200px;overflow-y:auto;margin-top:6px">
-    ${[...new Set(excludedRows.map(r=>r.name))].map(n=>{
+  let excludedHtml='';
+  if(excludedRows.length){
+    const uniqueNames=[...new Set(excludedRows.map(r=>r.name))];
+    const rows=uniqueNames.map(n=>{
       const tot=excludedRows.filter(r=>r.name===n).reduce((a,r)=>a+r.amount,0);
-      return \`<div style="font-size:11px;padding:2px 0;display:flex;justify-content:space-between"><span style="color:var(--mu)">\${n}</span><span style="color:var(--rd);margin-left:12px">\${tot.toLocaleString('es-ES',{minimumFractionDigits:2})} €</span></div>\`;
-    }).join('')}
-    </div></details>`:'';
-  prev.innerHTML=labels.map(f=>`<span style="background:var(--gl);color:var(--gd);border-radius:4px;padding:2px 8px;font-size:11px;margin-right:6px">✓ ${f}</span>`).join('')+
-    ` <span style="margin-left:8px">${Object.keys(pyg).length} pisos · ${matchedRows} líneas procesadas de ${totalRows} totales</span>`+excludedHtml;
+      return '<div style="font-size:11px;padding:2px 0;display:flex;justify-content:space-between"><span style="color:var(--mu)">'+n+'</span><span style="color:var(--rd);margin-left:12px">'+tot.toLocaleString('es-ES',{minimumFractionDigits:2})+' €</span></div>';
+    }).join('');
+    excludedHtml='<details style="margin-top:8px"><summary style="cursor:pointer;font-size:11px;color:var(--mu)">'+excludedRows.length+' líneas (RINC)/(GA) excluidas sin piso reconocido · '+excludedEur.toLocaleString('es-ES',{minimumFractionDigits:2})+' €</summary><div style="max-height:200px;overflow-y:auto;margin-top:6px">'+rows+'</div></details>';
+  }
+  prev.innerHTML=labels.map(f=>'<span style="background:var(--gl);color:var(--gd);border-radius:4px;padding:2px 8px;font-size:11px;margin-right:6px">✓ '+f+'</span>').join('')+
+    ' <span style="margin-left:8px">'+Object.keys(pyg).length+' pisos · '+matchedRows+' líneas procesadas de '+totalRows+' totales</span>'+excludedHtml;
 
   document.getElementById('up').style.display='none';
   document.getElementById('res').style.display='block';
