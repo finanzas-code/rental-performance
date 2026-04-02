@@ -355,6 +355,7 @@ function renderSummary(){
     '<div class="met" style="border-color:'+gapCol+'"><div class="met-l" style="color:'+gapCol+'">GAP neto vs disposición</div><div class="met-v" style="color:'+gapCol+'">'+gapFmt+'</div><div class="met-sub" style="color:'+gapCol+'">'+(devN!==null?fmtP(devN):"—")+'</div></div>';
 }
 
+function setYear(v){curYear=v;curMo="all";render();}
 function renderFilters(){
   var years=getAllYears();
   var yO='<option value="all">Todos los años</option>';years.forEach(function(y){yO+='<option value="'+y+'"'+(y===curYear?" selected":"")+'>'+y+'</option>';});
@@ -363,7 +364,7 @@ function renderFilters(){
   var pisos=getAllPisos();
   var pO='<option value="all">Todos los pisos</option>';pisos.forEach(function(p){pO+='<option value="'+p+'"'+(p===curPiso?" selected":"")+'>'+p+'</option>';});
   document.getElementById("filters").innerHTML=
-    '<select class="sel" onchange="curYear=this.value;curMo=\"all\";render()">'+yO+'</select>'+
+    '<select class="sel" onchange="setYear(this.value)">'+yO+'</select>'+
     '<select class="sel" onchange="curMo=this.value;render()">'+mO+'</select>'+
     '<select class="sel" style="min-width:160px" onchange="curPiso=this.value;render()">'+pO+'</select>'+
     '<span style="font-size:12px;color:var(--mu)">RAG: <span style="color:var(--g)">●≥−5%</span> <span style="color:var(--a)">●−5/−15%</span> <span style="color:var(--r)">●&lt;−15%</span></span>';
