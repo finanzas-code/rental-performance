@@ -118,11 +118,11 @@ tr:hover td{background:#faf9f6}
       <div class="hint-cols">
         Ingresos: cuentas <span>(RINC)</span> · Gastos: cuentas <span>(GA)</span> · El nombre del piso se extrae del nombre de cuenta
       </div>
-      <input type="file" id="fi" accept=".csv,.tsv,.txt" multiple style="display:none">
-      <label for="fi" class="drop" id="dz" style="margin-top:1.5rem;display:block;cursor:pointer">
+      <input type="file" id="fi" multiple style="display:none">
+      <div class="drop" id="dz" style="margin-top:1.5rem;display:block;cursor:pointer">
         <p>Arrastra el <strong>CSV</strong> del libro diario aquí</p>
         <p style="margin-top:6px;font-size:12px">o haz clic para seleccionar</p>
-      </label>
+      </div>
     </div>
     <div class="err" id="err"></div>
     <div class="prev-card" id="prev"></div>
@@ -284,10 +284,13 @@ function parseCSV(txt){
 
 // ── File handling ─────────────────────────────────────────────────────
 const dz=document.getElementById('dz');
-dz.ondragover=e=>{e.preventDefault();e.stopPropagation();dz.classList.add('over')};
-dz.ondragleave=e=>{e.preventDefault();dz.classList.remove('over')};
-dz.ondrop=e=>{e.preventDefault();e.stopPropagation();dz.classList.remove('over');handleFiles(e.dataTransfer.files)};
-document.getElementById('fi').onchange=e=>handleFiles(e.target.files);
+const fi=document.getElementById('fi');
+dz.addEventListener('click',()=>fi.click());
+dz.addEventListener('dragenter',e=>{e.preventDefault();e.stopPropagation();dz.classList.add('over')});
+dz.addEventListener('dragover',e=>{e.preventDefault();e.stopPropagation();dz.classList.add('over')});
+dz.addEventListener('dragleave',e=>{e.preventDefault();e.stopPropagation();dz.classList.remove('over')});
+dz.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();dz.classList.remove('over');handleFiles(e.dataTransfer.files)});
+fi.addEventListener('change',e=>handleFiles(e.target.files));
 
 function handleFiles(files){
   if(!files.length) return;
